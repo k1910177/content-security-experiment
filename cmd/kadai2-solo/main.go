@@ -1,6 +1,10 @@
 package main
 
-import "contentssecurity/pkg/table"
+import (
+	"contentssecurity/pkg/table"
+
+	conn "github.com/uecconsecexp/secexp2022/se_go/connector"
+)
 
 func main() {
 	// Chugaku
@@ -36,4 +40,21 @@ func main() {
 	// Export
 	aptitudeTable.ExportTable("bin/tekisei.txt", "適性")
 	resultTable.ExportResult("bin/kekka.txt", "合否")
+}
+
+func yobikouSide() {
+	yobikou, err := conn.NewYobikouServer()
+	if err != nil {
+		panic(err)
+	}
+	defer yobikou.Close()
+}
+
+func chugakuSide(addr string) {
+	chugaku, err := conn.NewChugakuClient(addr)
+	if err != nil {
+		panic(err)
+	}
+	defer chugaku.Close()
+
 }

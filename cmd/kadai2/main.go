@@ -1,46 +1,74 @@
 package main
 
 import (
-	consec "contentssecurity/pkg/lib"
+	"contentssecurity/pkg/table"
+	"fmt"
 	"time"
+
+	conn "github.com/uecconsecexp/secexp2022/se_go/connector"
 )
 
 func main() {
-	// ここからプログラム記述開始
-
-	// 中学
-	// server_addr := "0.0.0.0"
-	// ↑ハードコードしたくない場合
-	// 方法 1. コマンドライン引数で受け取る: flagパッケージ
-	// 方法 2. 環境変数で受け取る: godotenvモジュール & os.Getenv関数
-	// consec.ChugakuSide(server_addr)
-
-	// 予備校
-	// consec.YobikouSide()
-
-	// ↓1人で検証用
-	demo()
-}
-
-// パートナーとではなく、一人で検証を行う際は、以下のようにします。
-func demo() {
-	yc := make(chan interface{}) // goroutine終了を知らせるためのチャンネル
-	// goroutineを使用し、マルチスレッド処理としています。
+	yc := make(chan bool)
 	go func() {
-		// lib.goを読んでください。
-		consec.YobikouSide()
-		yc <- struct{}{}
+		yobikouSide()
+		yc <- true
 	}()
 
-	// 予備校がサーバーを建てるのを少し待ちます
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 
-	cc := make(chan interface{})
+	cc := make(chan bool)
 	go func() {
-		consec.ChugakuSide("0.0.0.0")
-		cc <- struct{}{}
+		chugakuSide("0.0.0.0")
+		cc <- true
 	}()
 
 	<-yc
 	<-cc
+}
+
+func yobikouSide() {
+	yobikou, err := conn.NewYobikouServer()
+	if err != nil {
+		panic(err)
+	}
+	defer yobikou.Close()
+
+	B, _ := table.ImportTable("data/omomi.txt")
+	C, _ := table.ImportTable("data/saiteiten.txt")
+
+	// Wait and receive for byte array
+	m, err := yobikou.Receive()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Received: %s\n", m)
+
+	// Send table
+	matrix := [][]float64{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	err = yobikou.SendTable(matrix)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func chugakuSide(addr string) {
+	chugaku, err := conn.NewChugakuClient(addr)
+	if err != nil {
+		panic(err)
+	}
+	defer chugaku.Close()
+
+	// Send byte array
+	err = chugaku.Send([]byte("ping"))
+	if err != nil {
+		panic(err)
+	}
+
+	// Wait and receive table
+	matrix, err := chugaku.ReceiveTable()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Received: %v\n", matrix)
 }
