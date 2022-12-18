@@ -4,10 +4,10 @@ import "gonum.org/v1/gonum/mat"
 
 func (a *Table) Add(b *Table) *Table {
 	var m mat.Dense
-	m.Add(a.Values, b.Values)
+	m.Add(a.values, b.values)
 
 	return &Table{
-		Values: &m,
+		values: &m,
 		Rows:   a.Rows,
 		Cols:   b.Cols,
 	}
@@ -15,10 +15,10 @@ func (a *Table) Add(b *Table) *Table {
 
 func (a *Table) Mul(b *Table) *Table {
 	var m mat.Dense
-	m.Mul(a.Values, b.Values)
+	m.Mul(a.values, b.values)
 
 	return &Table{
-		Values: &m,
+		values: &m,
 		Rows:   a.Rows,
 		Cols:   b.Cols,
 	}
@@ -26,39 +26,39 @@ func (a *Table) Mul(b *Table) *Table {
 
 func (a *Table) Inv() *Table {
 	var m mat.Dense
-	m.Inverse(a.Values)
+	m.Inverse(a.values)
 
 	return &Table{
-		Values: &m,
+		values: &m,
 		Rows:   a.Rows,
 		Cols:   a.Cols,
 	}
 }
 
 func (a *Table) Slice(rowStart, rowEnd, colStart, colEnd int) *Table {
-	m := a.Values.Slice(rowStart, rowEnd, colStart, colEnd)
+	m := a.values.Slice(rowStart, rowEnd, colStart, colEnd)
 
 	return &Table{
-		Values: mat.DenseCopyOf(m),
+		values: mat.DenseCopyOf(m),
 		Rows:   a.Rows[rowStart:rowEnd],
 		Cols:   a.Cols[colStart:colEnd],
 	}
 }
 
 func (a *Table) Evaluate(b *Table) *Table {
-	rowSize, colSize := a.Values.Caps()
+	rowSize, colSize := a.values.Caps()
 	result := Table{
 		Rows:   a.Rows,
 		Cols:   a.Cols,
-		Values: mat.NewDense(rowSize, colSize, nil),
+		values: mat.NewDense(rowSize, colSize, nil),
 	}
 
 	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
 		for colIndex := 0; colIndex < colSize; colIndex++ {
-			if a.Values.At(rowIndex, colIndex) >= b.Values.At(0, colIndex) {
-				result.Values.Set(rowIndex, colIndex, 1)
+			if a.values.At(rowIndex, colIndex) >= b.values.At(0, colIndex) {
+				result.values.Set(rowIndex, colIndex, 1)
 			} else {
-				result.Values.Set(rowIndex, colIndex, 0)
+				result.values.Set(rowIndex, colIndex, 0)
 			}
 		}
 	}

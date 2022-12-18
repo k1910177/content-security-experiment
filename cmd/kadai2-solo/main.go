@@ -8,15 +8,15 @@ import (
 
 func main() {
 	// Chugaku
-	A, _ := table.ImportTable("data/seiseki.txt")
+	A, _ := table.Import("data/seiseki.txt")
 
 	// Yobikou
-	B, _ := table.ImportTable("data/omomi.txt")
-	C, _ := table.ImportTable("data/saiteiten.txt")
+	B, _ := table.Import("data/omomi.txt")
+	C, _ := table.Import("data/saiteiten.txt")
 
 	// Create random matrix M
 	MRows, MCols := len(A.Cols), len(B.Rows)
-	M := table.RandomTable(MRows, MCols)
+	M := table.Random(MRows, MCols)
 
 	// Send M and calculate M inverse
 	MInv := M.Inv()
@@ -38,7 +38,7 @@ func main() {
 	resultTable := aptitudeTable.Evaluate(C)
 
 	// Export
-	aptitudeTable.ExportTable("bin/tekisei.txt", "適性")
+	aptitudeTable.Export("bin/tekisei.txt", "適性")
 	resultTable.ExportResult("bin/kekka.txt", "合否")
 }
 
