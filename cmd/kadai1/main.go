@@ -12,6 +12,6 @@ func main() {
 	aptitudeTable := gradeTable.Mul(weightTable)
 	resultTable := aptitudeTable.Evaluate(minGradeTable)
 
-	aptitudeTable.Export("bin/tekisei.txt", "適性")
-	resultTable.ExportResult("bin/kekka.txt", "合否")
+	aptitudeTable.Export("data/out/tekisei.txt", "適性")
+	resultTable.ExportResult("data/out/kekka.txt", "合否")
 }
