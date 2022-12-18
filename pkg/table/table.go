@@ -21,13 +21,18 @@ func New(values [][]float64, rows []string, cols []string) *Table {
 	records := make([]float64, rowSize*colSize)
 	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
 		for colIndex := 0; colIndex < colSize; colIndex++ {
-			records[rowIndex*rowSize+colIndex] = values[rowIndex][colIndex]
+			records[rowIndex*colSize+colIndex] = values[rowIndex][colIndex]
 		}
 	}
+
+	rowsSlice, colsSlice := make([]string, rowSize), make([]string, colSize)
+	copy(rowsSlice, rows)
+	copy(colsSlice, cols)
+
 	return &Table{
 		values: mat.NewDense(rowSize, colSize, records),
-		Rows:   rows,
-		Cols:   cols,
+		Rows:   rowsSlice,
+		Cols:   colsSlice,
 	}
 }
 
