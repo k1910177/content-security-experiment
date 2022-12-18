@@ -73,7 +73,7 @@ func chugakuSide(addr string) {
 	}
 
 	// Export result
-	result.ExportResult("bin/kekka.txt", "合否")
+	result.ExportResult("data/out/kekka.txt", "合否")
 }
 
 func yobikouSide() {
@@ -120,7 +120,7 @@ func yobikouSide() {
 
 	// Calculate and export aptitude
 	aptitude := APrimePrime.Add(BPrimePrime)
-	aptitude.Export("bin/tekisei.txt", "適性")
+	aptitude.Export("data/out/tekisei.txt", "適性")
 
 	// Evaluate and send result
 	result := aptitude.Evaluate(C)
