@@ -7,6 +7,11 @@ Get a local copy
 git clone https://github.com/k1910177/content-security-experiment
 ```
 
+Set env file
+```
+cp .env.example .env
+```
+
 Develop
 ```
 go run ./cmd/kadai1/main.go

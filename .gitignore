@@ -2,3 +2,4 @@ z/
 bin/
 out/
 .DS_Store
+.env

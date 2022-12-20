@@ -2,12 +2,21 @@ package main
 
 import (
 	"contentssecurity/pkg/table"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	conn "github.com/uecconsecexp/secexp2022/se_go/connector"
 )
 
 func main() {
-	addr := "0.0.0.0"
+	// Load env file
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	addr := os.Getenv("SERVER_ADDRESS")
 
 	client, err := conn.NewChugakuClient(addr)
 	if err != nil {
