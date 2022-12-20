@@ -12,11 +12,9 @@ import (
 
 type Table struct {
 	values *mat.Dense
-	Rows   []string
-	Cols   []string
 }
 
-func New(values [][]float64, rows []string, cols []string) *Table {
+func New(values [][]float64) *Table {
 	rowSize, colSize := len(values), len(values[0])
 	records := make([]float64, rowSize*colSize)
 	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
@@ -25,22 +23,14 @@ func New(values [][]float64, rows []string, cols []string) *Table {
 		}
 	}
 
-	rowsSlice, colsSlice := make([]string, rowSize), make([]string, colSize)
-	copy(rowsSlice, rows)
-	copy(colsSlice, cols)
-
 	return &Table{
 		values: mat.NewDense(rowSize, colSize, records),
-		Rows:   rowsSlice,
-		Cols:   colsSlice,
 	}
 }
 
 func Random(rowSize, colSize int) *Table {
 	table := Table{
 		values: mat.NewDense(rowSize, colSize, nil),
-		Rows:   make([]string, rowSize),
-		Cols:   make([]string, colSize),
 	}
 
 	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
@@ -68,21 +58,11 @@ func Import(path string) (*Table, error) {
 	rowSize, colSize := len(records)-1, len(records[0])-1
 	table := Table{
 		values: mat.NewDense(rowSize, colSize, nil),
-		Rows:   make([]string, rowSize),
-		Cols:   make([]string, colSize),
 	}
 
 	for rowIndex, rowItems := range records {
 		for colIndex, item := range rowItems {
-			if colIndex == 0 && rowIndex == 0 {
-				continue
-			}
-			if rowIndex == 0 && colIndex > 0 {
-				table.Cols[colIndex-1] = item
-				continue
-			}
-			if colIndex == 0 && rowIndex > 0 {
-				table.Rows[rowIndex-1] = item
+			if colIndex == 0 || rowIndex == 0 {
 				continue
 			}
 
@@ -108,22 +88,10 @@ func (table *Table) Export(path string, title string) error {
 	defer writer.Flush()
 
 	rowSize, colSize := table.values.Caps()
-	for rowIndex := 0; rowIndex < rowSize+1; rowIndex++ {
-		record := make([]string, colSize+1)
+	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
+		record := make([]string, colSize)
 		for colIndex := range record {
-			if colIndex == 0 && rowIndex == 0 {
-				record[colIndex] = title
-				continue
-			}
-			if rowIndex == 0 && colIndex > 0 {
-				record[colIndex] = table.Cols[colIndex-1]
-				continue
-			}
-			if colIndex == 0 && rowIndex > 0 {
-				record[0] = table.Rows[rowIndex-1]
-				continue
-			}
-			value := table.values.At(rowIndex-1, colIndex-1)
+			value := table.values.At(rowIndex, colIndex)
 			record[colIndex] = fmt.Sprintf("%.2f", value)
 		}
 
@@ -147,23 +115,10 @@ func (table *Table) ExportResult(path string, title string) error {
 	defer writer.Flush()
 
 	rowSize, colSize := table.values.Caps()
-	for rowIndex := 0; rowIndex < rowSize+1; rowIndex++ {
-		record := make([]string, colSize+1)
+	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {
+		record := make([]string, colSize)
 		for colIndex := range record {
-			if colIndex == 0 && rowIndex == 0 {
-				record[colIndex] = title
-				continue
-			}
-			if rowIndex == 0 && colIndex > 0 {
-				record[colIndex] = table.Cols[colIndex-1]
-				continue
-			}
-			if colIndex == 0 && rowIndex > 0 {
-				record[0] = table.Rows[rowIndex-1]
-				continue
-			}
-
-			if table.values.At(rowIndex-1, colIndex-1) == 0 {
+			if table.values.At(rowIndex, colIndex) == 0 {
 				record[colIndex] = "否"
 			} else {
 				record[colIndex] = "合"
@@ -189,4 +144,14 @@ func (table *Table) ToSlice() [][]float64 {
 		}
 	}
 	return records
+}
+
+func (table *Table) RowSize() int {
+	r, _ := table.values.Caps()
+	return r
+}
+
+func (table *Table) ColSize() int {
+	_, c := table.values.Caps()
+	return c
 }

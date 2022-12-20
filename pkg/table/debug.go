@@ -6,8 +6,6 @@ import (
 
 func (table *Table) Print(title string) {
 	fmt.Println(title)
-	fmt.Printf("Rows: %v\n", table.Rows)
-	fmt.Printf("Cols: %v\n", table.Cols)
 
 	rowSize, colSize := table.values.Caps()
 	for rowIndex := 0; rowIndex < rowSize; rowIndex++ {

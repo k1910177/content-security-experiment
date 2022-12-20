@@ -37,8 +37,8 @@ func chugakuSide(addr string) {
 	A, _ := table.Import("data/seiseki.txt")
 
 	// Create random matrix M
-	MRows, MCols := len(A.Cols), len(A.Cols)
-	M := table.Random(MRows, MCols)
+	MRows, MCols := A.ColSize(), A.ColSize()
+	M := table.Random(MCols, MCols)
 
 	// Send M to yobikou
 	if err = M.ChugakuSend(&client); err != nil {
@@ -55,7 +55,7 @@ func chugakuSide(addr string) {
 	}
 
 	// Wait and receive B'
-	BPrime, err := table.ChugakuReceive(&client, nil, nil)
+	BPrime, err := table.ChugakuReceive(&client)
 	if err != nil {
 		panic(err)
 	}
@@ -67,7 +67,7 @@ func chugakuSide(addr string) {
 	}
 
 	// Wait and receive result
-	result, err := table.ChugakuReceive(&client, nil, nil)
+	result, err := table.ChugakuReceive(&client)
 	if err != nil {
 		panic(err)
 	}
@@ -87,18 +87,18 @@ func yobikouSide() {
 	C, _ := table.Import("data/saiteiten.txt")
 
 	// Wait and receive M
-	M, err := table.YobikouReceive(&server, nil, nil)
+	M, err := table.YobikouReceive(&server)
 	if err != nil {
 		panic(err)
 	}
 
 	// Calculate M' and slice
 	MInv := M.Inv()
-	MRows, MCols := len(M.Rows), len(M.Cols)
+	MRows, MCols := MInv.RowSize(), MInv.ColSize()
 	MInvTop, MInvBottom := MInv.Slice(0, MRows/2, 0, MCols), MInv.Slice(MRows/2, MRows, 0, MCols)
 
 	// Wait and receive A'
-	APrime, err := table.YobikouReceive(&server, nil, nil)
+	APrime, err := table.YobikouReceive(&server)
 	if err != nil {
 		panic(err)
 	}
@@ -113,7 +113,7 @@ func yobikouSide() {
 	BPrimePrime := APrime.Mul(MInvTop).Mul(B)
 
 	// Wait and receive A''
-	APrimePrime, err := table.YobikouReceive(&server, nil, nil)
+	APrimePrime, err := table.YobikouReceive(&server)
 	if err != nil {
 		panic(err)
 	}

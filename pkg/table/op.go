@@ -8,8 +8,6 @@ func (a *Table) Add(b *Table) *Table {
 
 	return &Table{
 		values: &m,
-		Rows:   a.Rows,
-		Cols:   b.Cols,
 	}
 }
 
@@ -19,8 +17,6 @@ func (a *Table) Mul(b *Table) *Table {
 
 	return &Table{
 		values: &m,
-		Rows:   a.Rows,
-		Cols:   b.Cols,
 	}
 }
 
@@ -30,8 +26,6 @@ func (a *Table) Inv() *Table {
 
 	return &Table{
 		values: &m,
-		Rows:   a.Rows,
-		Cols:   a.Cols,
 	}
 }
 
@@ -40,16 +34,12 @@ func (a *Table) Slice(rowStart, rowEnd, colStart, colEnd int) *Table {
 
 	return &Table{
 		values: mat.DenseCopyOf(m),
-		Rows:   a.Rows[rowStart:rowEnd],
-		Cols:   a.Cols[colStart:colEnd],
 	}
 }
 
 func (a *Table) Evaluate(b *Table) *Table {
 	rowSize, colSize := a.values.Caps()
 	result := Table{
-		Rows:   a.Rows,
-		Cols:   a.Cols,
 		values: mat.NewDense(rowSize, colSize, nil),
 	}
 
